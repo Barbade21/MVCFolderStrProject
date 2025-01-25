@@ -1,0 +1,70 @@
+﻿@model MVCFolderStrProjectLibrary.User
+
+<form class="container">
+    <div class="row align-content-center">
+        <h4>User</h4>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.UserName)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.UserName)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Address)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Address)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Gender)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Gender)
+
+            </dd>
+
+
+            <dt>
+                @Html.DisplayNameFor(model => model.CountryName)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.CountryName)
+            </dd>
+
+
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.StateName)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.StateName)
+            </dd>
+
+
+
+            <dt>
+                @Html.DisplayNameFor(model => model.CityName)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.CityName)
+            </dd>
+
+        </dl>
+    </div>
+    <p>
+        <a href="#" class="btn btn-sm btn-warning edit-link" data-id="@Model.UserId">Edit</a> |
+        <button type="button" class="btn-sm btn-close-white" data-bs-dismiss="modal">Close</button>
+        @*@Html.ActionLink("Cancel", "AllData")*@
+    </p>
+</form>

@@ -1,0 +1,218 @@
+﻿@model IEnumerable<MVCFolderStrProjectLibrary.User>
+
+@{
+    ViewBag.Title = "AllData";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>AllData</h2>
+
+
+
+<p>
+    <a href="#" class="btn btn-primary add-user">Add New User</a>
+</p>
+<p>
+    @*<input type="text" id="searchBar" class="form-control mb-3" placeholder="Search by name or address" style="width: 300px; display: inline-block;" />*@
+
+
+    <label for="genderFilter">Filter by Gender: </label>
+    <select id="genderFilter" class="form-control" style="width: 200px; display: inline-block;">
+        <option value="">All</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+    </select>
+</p>
+
+
+
+<div class="modal fade" id="userDetailsModal" tabindex="-1" aria-labelledby="userDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userDetailsModalLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalBodyContent"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="container">
+        <table class="table table-info table-bordered table-striped table-bordered dt-responsive nowrap" id="example" width="100%">
+            <thead>
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.UserName)</th>
+                    <th>@Html.DisplayNameFor(model => model.Address)</th>
+                    <th>@Html.DisplayNameFor(model => model.Gender)</th>
+                    <th>@Html.DisplayNameFor(model => model.CountryName)</th>
+                    <th>@Html.DisplayNameFor(model => model.StateName)</th>
+                    <th>@Html.DisplayNameFor(model => model.CityName)</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="userTableBody">
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => item.UserName)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Address)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Gender)</td>
+                        <td>@Html.DisplayFor(modelItem => item.CountryName)</td>
+                        <td>@Html.DisplayFor(modelItem => item.StateName)</td>
+                        <td>@Html.DisplayFor(modelItem => item.CityName)</td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-info user-details" data-id="@item.UserId">Details</a>
+                            @*<a href="#" class="user-details-link" data-id="@item.UserId">Details</a>
+                                <a href="@Url.Action("UserDetails", "Home", new { id = item.UserId })" class="btn btn-sm btn-info user-details" data-id="@item.UserId">Details</a>*@
+                            <a href="#" class="btn btn-sm btn-warning edit-link" data-id="@item.UserId">Edit</a>
+                            @Html.ActionLink("Delete", "Delete", new { id = item.UserId }, new { @class = "btn btn-sm btn-danger" })
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+
+
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>   
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/2.2.1/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.2.1/js/dataTables.bootstrap5.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            new DataTable('#example');
+        });
+    </script>
+    <script>
+
+        $(document).ready(function () {
+
+            $('#myForm').on('#submit', function (e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'User Added Successfully!.',
+                    icon: 'success',
+                    confirmButtonText: 'Close'
+                });
+            },);
+        });
+    </script>
+    <script>
+        $(document).on("click", ".user-details, .edit-link, .add-user", function (e) {
+            debugger
+            e.preventDefault();
+            var action = $(this).hasClass("user-details") ? "UserDetails" :
+                $(this).hasClass("edit-link") ? "Edit" : "AddUser";
+            var userId = $(this).data("id") || 0;
+            debugger
+            $.ajax({
+                url: '@Url.Action("PLACEHOLDER", "Home")'.replace('PLACEHOLDER', action),
+                    @*`@Url.Action("Home", "Home")/${action}`,*@
+                type: 'GET',
+                data: { id: userId },
+                success: function (result) {
+                    $('#modalBodyContent').html(result);
+                    $('#userDetailsModalLabel').text(action === "AddUser" ? "Add New User" : "User Details");
+                    $('#userDetailsModal').modal('show');
+                },
+                error: function () {
+                    alert('Error loading user details.');
+                }
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('#genderFilter').change(function () {
+                debugger
+                var selectedGender = $(this).val().toLowerCase();
+                $('#userTableBody tr').filter(function () {
+                    var rowGender = $(this).find('td:nth-child(3)').text().toLowerCase();
+                    if (selectedGender === "") {
+                        $(this).show();
+                    } else {
+                        $(this).toggle(rowGender === selectedGender);
+                    }
+                });
+            });
+        });
+    </script>
+
+
+    <script>
+
+        $(document).ready(function () {
+
+            $('#CountryId').change(function () {
+
+                var countryId = $(this).val();
+                $('#StateId').empty().append('<option value="">Select a State</option>');
+                $('#CityId').empty().append('<option value="">Select a City</option>');
+
+                if (countryId) {
+                    $.getJSON('@Url.Action("StateList", "Home")', { CountryId: countryId }, function (data) {
+                        $.each(data, function (index, item) {
+                            $('#StateId').append('<option value="' + item.Value + '">' + item.Text + '</option>');
+                        });
+                    }).fail(function () {
+                        alert('Failed to load states.');
+                    });
+                }
+            });
+
+            $('#StateId').change(function () {
+                var stateId = $(this).val();
+                $('#CityId').empty().append('<option value="">Select a City</option>');
+
+                if (stateId) {
+                    $.getJSON('@Url.Action("CityList", "Home")', { stateId: stateId }, function (data) {
+                        $.each(data, function (index, item) {
+                            $('#CityId').append('<option value="' + item.Value + '">' + item.Text + '</option>');
+                        });
+                    }).fail(function () {
+                        alert('Failed to load cities.');
+                    });
+                }
+            });
+        });
+
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('#genderFilter').change(function () {
+                var gender = $(this).val().toLowerCase();
+                $('#userTableBody tr').toggle(function () {
+                    return gender || $(this).find('td:nth-child(3)').text().toLowerCase() === gender;
+                });
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('#searchBar').on('input', function () {
+                var search = $(this).val().toLowerCase();
+                $('#userTableBody tr').each(function () {
+                    $(this).toggle($(this).text().toLowerCase().includes(search));
+                });
+            });
+        });
+    </script>
+
+
+
+
+}
